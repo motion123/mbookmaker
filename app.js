@@ -9,17 +9,22 @@ var bodyParser = require('body-parser');
 
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/jsonAPI');
+mongoose.connect('mongodb://localhost/jsonAPI', { config: { autoIndex: false } });
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 var api = require('./routes/api');
 var authenticate = require('./routes/authenticate');
 var board = require('./routes/board');
+var video = require('./routes/video');
 
 var app = express();
 
 var passport = require('passport');
+
+
+var paginate = require('express-paginate');
+app.use(paginate.middleware(20, 50));
 
 // session用のmiddlewaresを有効化
 app.use(passport.initialize());
@@ -47,6 +52,8 @@ app.use('/users', users);
 app.use('/api', api);
 app.use('/authenticate', authenticate);
 app.use('/board', board);
+app.use('/video', video);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

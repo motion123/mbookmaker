@@ -11,6 +11,65 @@ require('../config/passport')(passport);
 var bcrypt = require('bcrypt');
 var Board = require('../models/board');
 var getToken = require('./cont/token');
+var InBoard = require('../models/inboard');
+var Video = require('../models/video');
+var paginate = require('express-paginate');
+
+
+router.get('/:id', passport.authenticate('jwt', {session: false}), function(req, res,next) {
+    var token = getToken(req.headers);
+    if(token) {
+        var decoded = jwt.decode(token, config.secret);
+        User.findOne({
+            user_email: decoded.user_email
+        }, function (err, user) {
+            if(err) throw err;
+            if (!user) {
+                return res.status(403).send({success: false, msg: 'Authentication failed. User not found.'});
+            } else {
+                req.userinfo = user;
+                next();
+            }
+        })
+    }
+});
+
+router.get('/:id', function(req,res,next) {
+   Board.findOne({
+       _id:req.params.id
+   },function (err,success) {
+       if(err) throw err;
+       if(!success){
+           return res.status(403).send({msg: 'Board not found.'});
+       } else{
+           next();
+       }
+   })
+});
+
+router.get('/:id',function(req,res){
+    InBoard.paginate({
+            board_id: req.params.id
+    }, {
+	        select: 'created_at video_description video_title url video_id',
+	        sort:{created_at: 1},
+            page: req.query.page,
+            limit: req.query.limit
+    },function (err,success) {
+        if(err) throw err;
+        if(!success) {
+	        return res.status(404).send({success: false, msg: 'Board not found'});
+        }else {
+            res.json({
+	            currentPage: success.page,
+                pageCount: success.pages,
+                itemCount: success.total,
+                inBoardVideos: success.docs
+            });
+        }
+    })
+
+});
 
 router.post('/new', passport.authenticate('jwt', {session: false}), function(req, res,next) {
    var token = getToken(req.headers);
@@ -84,14 +143,14 @@ router.post('/edit', function (req,res) {
     })
 });
 
-router.delete('/delete', passport.authenticate('jwt', { session: false}),function(req,res){
+router.delete('/:id/delete', passport.authenticate('jwt', { session: false}),function(req,res){
     var token = getToken(req.headers);
     if (token) {
         var decoded = jwt.decode(token, config.secret);
         console.log(decoded._id);
         Board.remove({
             user_id: decoded._id,
-            _id: req.body.board_id
+            _id: req.params.id
         }, function(err) {
             if (err) {
                 throw err;

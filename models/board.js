@@ -13,13 +13,14 @@ var Schema = mongoose.Schema;
 
 var BoardSchema = new Schema({
    user_id: {
-       type: String,
+       type: Schema.Types.ObjectId,
+       ref: 'User',
        required: [true, 'uuid is required']
    },
     title: {
         type: String,
         maxlength: [50, 'Too long'],
-        required: [true, 'borde title is required']
+        required: [true, 'board title is required']
    },
     description: {
         type: String,

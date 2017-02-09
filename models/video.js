@@ -16,7 +16,7 @@ var VideoSchema = new Schema({
        maxlength:[100,'Too long']
     },
     user_id: {
-        type: String,
+        type: Schema.Types.ObjectId,
         required: [true, 'uuid is required']
     },
     created_at: {
