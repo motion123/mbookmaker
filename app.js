@@ -47,12 +47,29 @@ app.use(require('node-sass-middleware')({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+var allowCrossDomain = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  // intercept OPTIONS method
+  if ('OPTIONS' == req.method) {
+    res.status(200).end();
+  }
+  else {
+    next();
+  }
+};
+app.use(allowCrossDomain);
+
+
 app.use('/', index);
-app.use('/users', users);
+app.use('/user', users);
 app.use('/api', api);
-app.use('/authenticate', authenticate);
+app.use('/auth', authenticate);
 app.use('/board', board);
 app.use('/video', video);
+
 
 
 // catch 404 and forward to error handler

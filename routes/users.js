@@ -17,11 +17,15 @@ router.post('/new', function(req, res) {
   user.user_password = req.body.user_password;
   user.created_at = Date.now();
 
-  user.save(function(err) {
+  user.save(function(err,success) {
     if (err) {
       res.send(err);
+    }
+    if(!success){
+      return res.status(403).send({success: false, msg: 'User-Create failed.'});
     }else {
-      res.json({message: 'User created!'});
+      var token = jwt.encode(success, config.secret);
+      res.json({success: true, token: 'JWT ' + token});
     }
   })
 });
