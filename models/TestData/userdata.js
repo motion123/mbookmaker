@@ -63,7 +63,7 @@ function BoardData(success){
     for(var i= 0;i <= 100; i++) {
         var board = new Board();
 
-        board.user_id = success._id;
+        board._user = success._id;
         board.title= "test_name" + i;
         board.user_email= "test" + i + "@test.com";
         board.user_password = "tese_password" + i;
@@ -83,10 +83,12 @@ function VideoData(success){
     for(var i= 0;i <= 100; i++) {
         var video = new Video();
 
-        video.user_id = boarddata.user_id;
+        video._user = boarddata._user;
         video.url = "https://www.youtube.com/watch?v=N7OPZOBJZyI&" + Math.floor( Math.random() * 99999999 );
         video.created_at = Date.now();
-
+        video.title = "test" + i;
+        video.thumbnail = "https://i.ytimg.com/vi/kdm5Gb0soAU/hqdefault.jpg?" + i;
+        video.favorite = i;
         video.save(function(err,ok){
             if(err) console.log(err);
             if(ok) InBoardData(ok,boarddata);
@@ -98,12 +100,12 @@ function VideoData(success){
 function InBoardData(success,boarddata) {
     var inboard = new InBoard();
     User.findOne({
-        _id: success.user_id
+        _id: success._user
     }, function (err, ok) {
         if (err) throw err;
         for(var i=0; i <= 30; i++) {
             console.log(success._id);
-            inboard.user_id = success.user_id;
+            inboard.user_id = success._user;
             inboard.user_name = ok.name;
             inboard.board_id = boarddata._id;
             inboard.board_title = boarddata.title;

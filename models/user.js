@@ -13,21 +13,22 @@ var Schema   = mongoose.Schema;
 var UserSchema = new Schema({
     name: {
         type: String,
-        minlength: [2, 'Too short'],
-        maxlength: [15, 'Too long'],
-        required: [true, 'name is required']
+        minlength: [2, '名前が短すぎます'],
+        maxlength: [15, '名前が長すぎです'],
+        required: [true, '名前が記入されていません']
     },
     user_email: {
         type: mongoose.SchemaTypes.Email,
-        minlength: [6, 'Too short'],
-        maxlength: [100, 'Too long'],
-        required: [true, 'id is required'],
+        minlength: [6, 'メールアドレスが短すぎます'],
+        maxlength: [100, 'メールアドレスが長すぎです'],
+        required: [true, 'メールアドレスが記入されていません'],
         unique: true
     },
     user_password: {
         type: String,
-        minlength: [8, 'Too short'],
-        required: [true, 'password is required']
+        minlength: [8, 'パスワードが短すぎます'],
+        maxlength: [100, 'パスワードが長すぎます'],
+        required: [true, 'パスワードが記入されていません']
     },
     created_at: {
         type: Date
@@ -38,6 +39,12 @@ var UserSchema = new Schema({
     updated_at: {
         type: Date,
         default: Date.now
+    },
+    video: {
+        type:Schema.Types.ObjectId, ref: 'Video'
+    },
+    board: {
+        type:Schema.Types.ObjectId, ref: 'Board'
     }
 });
 
@@ -70,6 +77,6 @@ UserSchema.methods.comparePassword = function (passw, cb) {
     });
 };
 
-UserSchema.plugin(uniqueValidator);
+UserSchema.plugin(uniqueValidator,{message: "登録済みのメールアドレスです"});
 
 module.exports = mongoose.model('User', UserSchema);

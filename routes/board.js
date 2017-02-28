@@ -92,7 +92,7 @@ router.post('/new', passport.authenticate('jwt', {session: false}), function(req
 router.post('/new',function (req,res) {
     var board = new Board();
 
-    board.user_id = req.userinfo._id;
+    board._user = req.userinfo._id;
     board.title = req.body.title;
     board.description = req.body.description ? req.body.description : "";
     board.secret = req.body.secret;
@@ -112,7 +112,7 @@ router.post('/edit', passport.authenticate('jwt', { session: false}), function(r
         var decoded = jwt.decode(token, config.secret);
         console.log(decoded._id);
         Board.findOne({
-            user_id: decoded._id,
+            _user: decoded._id,
             _id: req.body.board_id
         }, function(err, board) {
             if (err) throw err;
@@ -149,7 +149,7 @@ router.delete('/:id/delete', passport.authenticate('jwt', { session: false}),fun
         var decoded = jwt.decode(token, config.secret);
         console.log(decoded._id);
         Board.remove({
-            user_id: decoded._id,
+            _user: decoded._id,
             _id: req.params.id
         }, function(err) {
             if (err) {

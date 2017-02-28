@@ -12,7 +12,7 @@ var Schema = mongoose.Schema;
 
 
 var BoardSchema = new Schema({
-   user_id: {
+   _user: {
        type: Schema.Types.ObjectId,
        ref: 'User',
        required: [true, 'uuid is required']

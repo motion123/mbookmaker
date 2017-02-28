@@ -44,8 +44,10 @@ router.post('/new', function (req,res,next) {
         if(err) throw err;
         if(!video) {
             newVideo.url = req.body.url;
-            newVideo.user_id = req.userinfo._id;
+            newVideo._user = req.userinfo._id;
             newVideo.created_at = new Date();
+            newVideo.title = req.body.title;
+            newVideo.thumbnail = req.body.thumbnail;
 
             newVideo.save(function (err,success) {
                 if(err)
@@ -63,7 +65,7 @@ router.post('/new', function (req,res,next) {
 
 router.post('/new', function (req,res) {
     Board.findOne({
-        user_id: req.userinfo._id,
+        _user: req.userinfo._id,
         _id: req.body.board_id
     },function(err,board) {
         if(err) throw err;
@@ -86,6 +88,9 @@ router.post('/new', function (req,res) {
                 if (err)
                     res.status(403).send(err);
                 else
+                    Video.increment(req.videoinfo._id,function(err, result) {
+                        console.log(result);
+                    });
                     res.status(200).send(success);
             })
         }
@@ -109,7 +114,7 @@ router.get('/:id/info', function(req,res){
    InBoard.paginate({
        video_id: req.params.id,
    }, {
-        select: 'user_id user_name board_id board_title created_at',
+        select: '_user user_name board_id board_title created_at',
         sort: { created_at: 1},
         page: req.query.page,
         limit: req.query.limit

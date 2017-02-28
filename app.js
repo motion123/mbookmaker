@@ -17,6 +17,7 @@ var api = require('./routes/api');
 var authenticate = require('./routes/authenticate');
 var board = require('./routes/board');
 var video = require('./routes/video');
+var list = require('./routes/list');
 
 var app = express();
 
@@ -69,7 +70,7 @@ app.use('/api', api);
 app.use('/auth', authenticate);
 app.use('/board', board);
 app.use('/video', video);
-
+app.use('/list', list);
 
 
 // catch 404 and forward to error handler

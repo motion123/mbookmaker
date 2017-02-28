@@ -42,7 +42,16 @@ router.post('/login', function(req, res) {
         if (err) throw err;
 
         if (!user) {
-            res.send({success: false, mailAddressError: true, msg: 'Authentication failed. User not found.'});
+            res.send({
+                success: false,
+                error: {
+                    errors: {
+                        user_email:{
+                         message: 'メールアドレスが間違っています'
+                        }
+                    }
+                }
+            });
         } else {
             // check if password matches
             user.comparePassword(req.body.user_password, function (err, isMatch) {
@@ -52,7 +61,16 @@ router.post('/login', function(req, res) {
                     // return the information including token as JSON
                     res.json({success: true, token: 'JWT ' + token});
                 } else {
-                    res.send({success: false, passwordError: true,msg: 'Authentication failed. Wrong password.'});
+                    res.send({
+                        success: false,
+                        error: {
+                            errors: {
+                                user_password: {
+                                    message: 'パスワードが間違っています'
+                                }
+                            }
+                        }
+                    });
                 }
             });
         }

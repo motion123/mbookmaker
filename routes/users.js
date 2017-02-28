@@ -19,11 +19,9 @@ router.post('/new', function(req, res) {
 
   user.save(function(err,success) {
     if (err) {
-      res.send(err);
+      res.json({success:false,error: err});
     }
-    if(!success){
-      return res.status(403).send({success: false, msg: 'User-Create failed.'});
-    }else {
+    if(success){
       var token = jwt.encode(success, config.secret);
       res.json({success: true, token: 'JWT ' + token});
     }
