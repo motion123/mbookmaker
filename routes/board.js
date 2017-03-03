@@ -51,7 +51,7 @@ router.get('/:id',function(req,res){
     InBoard.paginate({
             board_id: req.params.id
     }, {
-	        select: 'created_at video_description video_title url video_id',
+	        select: 'created_at video_description video_title url_id video_id',
 	        sort:{created_at: 1},
             page: req.query.page,
             limit: req.query.limit

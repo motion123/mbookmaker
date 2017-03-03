@@ -45,7 +45,10 @@ var UserSchema = new Schema({
     },
     board: {
         type:Schema.Types.ObjectId, ref: 'Board'
-    }
+    },
+    inboard: {
+        type:Schema.Types.ObjectId, ref: 'InBoard'
+    },
 });
 
 UserSchema.pre('save', function (next) {

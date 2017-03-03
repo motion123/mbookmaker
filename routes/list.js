@@ -37,9 +37,9 @@ router.use(passport.authenticate('jwt', { session: false}), function(req, res, n
 router.get('/',function(req, res, next)  {
 	Video.paginate({},
 		{
-			select: 'url _user title thumbnail favorite',
+			select: 'url_id _user pattern title thumbnail favorite',
 			sort:{created_at:1},
-			populate: {path: '_user', select: '_id name'},
+			populate: {path: '_user', select: '_id name img'},
 			page: req.query.page,
 			limit: req.query.limit
 		}, function(err,success) {

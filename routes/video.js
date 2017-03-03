@@ -39,11 +39,13 @@ router.use(passport.authenticate('jwt', { session: false}), function(req, res, n
 router.post('/new', function (req,res,next) {
     var newVideo = new Video();
     Video.findOne({
-        url: req.body.url
+        url_id: req.body.url_id
     },function (err, video){
         if(err) throw err;
         if(!video) {
-            newVideo.url = req.body.url;
+            // URL をパースする方法を考える
+            newVideo.url_id = req.body.url_id;
+            // pattern を取得する方法を考える
             newVideo._user = req.userinfo._id;
             newVideo.created_at = new Date();
             newVideo.title = req.body.title;
@@ -74,12 +76,12 @@ router.post('/new', function (req,res) {
         } else {
             var inboard = new InBoard();
 
-            inboard.user_id = req.userinfo._id;
+            inboard._user = req.userinfo._id;
             inboard.user_name = req.userinfo.name;
             inboard.board_id = req.body.board_id;
             inboard.board_title = board.title;
             inboard.video_id = req.videoinfo._id;
-            inboard.url = req.videoinfo.url;
+            inboard.url_id = req.videoinfo.url_id;
             inboard.video_title = req.body.video_title;
             inboard.video_description = req.body.video_description ? req.body.video_description : "";
             inboard.created_at = new Date();
@@ -114,8 +116,9 @@ router.get('/:id/info', function(req,res){
    InBoard.paginate({
        video_id: req.params.id,
    }, {
-        select: '_user user_name board_id board_title created_at',
+        select: '_user board_id board_title created_at',
         sort: { created_at: 1},
+        populate: {path: '_user', select: '_id name'},
         page: req.query.page,
         limit: req.query.limit
    }, function(err, success) {
@@ -124,6 +127,7 @@ router.get('/:id/info', function(req,res){
            return res.status(404).send({success: false, msg: 'Video not found'});
        } else {
            res.json({
+               success: true,
                currentPage: success.page,
                pageCount: success.pages,
                itemCount: success.total,
@@ -135,7 +139,7 @@ router.get('/:id/info', function(req,res){
 
 router.post('/delete',function(req,res){
     InBoard.remove({
-      user_id: req.userinfo._id,
+      _user: req.userinfo._id,
       board_id: req.body.board_id,
       video_id: req.body.video_id
     },function (err, success) {

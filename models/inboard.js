@@ -3,7 +3,6 @@
  */
 var mongoose = require('mongoose');
 require('mongoose-type-email');
-require('mongoose-type-url');
 var mongoosePaginate = require('mongoose-paginate');
 var bcrypt = require('bcrypt');
 
@@ -11,12 +10,10 @@ var bcrypt = require('bcrypt');
 var Schema = mongoose.Schema;
 
 var InBoardSchema = new Schema({
-        user_id: {
+        _user: {
             type: Schema.Types.ObjectId,
+            ref: 'User',
             required: [true, 'ユーザーIDがありません']
-        },
-        user_name: {
-            type: String
         },
         board_id: {
             type: Schema.Types.ObjectId,
@@ -29,8 +26,8 @@ var InBoardSchema = new Schema({
             type: Schema.Types.ObjectId,
             required: [true, 'ビデオIDがありません']
         },
-        url: {
-            type: mongoose.SchemaTypes.Url,
+        url_id: {
+            type: String,
             maxlength:[100,'URLが長すぎです']
         },
         video_title: {
@@ -48,7 +45,7 @@ var InBoardSchema = new Schema({
 });
 
 InBoardSchema.index({board_id: 1, video_id:1});
-InBoardSchema.index({user_id:1, board_id:1});
+InBoardSchema.index({_user:1, board_id:1});
 InBoardSchema.index({created_at: 1});
 
 InBoardSchema.plugin(mongoosePaginate);

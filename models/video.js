@@ -11,10 +11,13 @@ var uniqueValidator = require('mongoose-unique-validator');
 var Schema = mongoose.Schema;
 
 var VideoSchema = new Schema({
-    url: {
-       type: mongoose.SchemaTypes.Url,
+    url_id: {
+       type: String,
        unique: true,
        maxlength:[100,'URLが長すぎます']
+    },
+    pattern:{
+        type: String,
     },
     title: {
         type: String,
@@ -51,7 +54,7 @@ VideoSchema.statics.increment = function(id, done) {
 
 VideoSchema.index({created_at: 1});
 VideoSchema.index({favorite: 1});
-VideoSchema.index({url: 1, _user: 1},{unique: true});
+VideoSchema.index({url_id: 1, _user: 1},{unique: true});
 
 VideoSchema.plugin(uniqueValidator);
 

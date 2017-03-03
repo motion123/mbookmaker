@@ -84,7 +84,8 @@ function VideoData(success){
         var video = new Video();
 
         video._user = boarddata._user;
-        video.url = "https://www.youtube.com/watch?v=N7OPZOBJZyI&" + Math.floor( Math.random() * 99999999 );
+        video.url_id = "N7OPZOBJZyI&" + Math.floor( Math.random() * 99999999 );
+        video.pattern = "YOUTUBE";
         video.created_at = Date.now();
         video.title = "test" + i;
         video.thumbnail = "https://i.ytimg.com/vi/kdm5Gb0soAU/hqdefault.jpg?" + i;
@@ -105,12 +106,12 @@ function InBoardData(success,boarddata) {
         if (err) throw err;
         for(var i=0; i <= 30; i++) {
             console.log(success._id);
-            inboard.user_id = success._user;
+            inboard._user = success._user;
             inboard.user_name = ok.name;
             inboard.board_id = boarddata._id;
             inboard.board_title = boarddata.title;
             inboard.video_id = success._id;
-            inboard.url = success.url;
+            inboard.url_id = success.url_id;
             inboard.video_title = "test" + Math.floor(Math.random() * 99999999);
             inboard.video_description = "test";
             inboard.created_at = Date.now();
