@@ -15,7 +15,6 @@ router.post('/new', function(req, res) {
   user.name = req.body.name;
   user.user_email = req.body.user_email;
   user.user_password = req.body.user_password;
-  user.created_at = Date.now();
 
   user.save(function(err,success) {
     if (err) {
@@ -102,6 +101,72 @@ router.get('/memberinfo', passport.authenticate('jwt', { session: false}), funct
     });
   } else {
     return res.status(403).send({success: false, msg: 'No token provided.'});
+  }
+});
+
+router.get('/memberinfo', passport.authenticate('jwt', { session: false}), function(req, res) {
+  var token = getToken(req.headers);
+  if (token) {
+    var decoded = jwt.decode(token, config.secret);
+    User.findOne({
+      user_email: decoded.user_email
+    }, function(err, user) {
+      if (err) throw err;
+
+      if (!user) {
+        return res.status(403).send({success: false, msg: 'Authentication failed. User not found.'});
+      } else {
+        res.json({success: true, msg: 'Welcome in the member area ' + user.user_email + '!'});
+      }
+    });
+  } else {
+    return res.status(403).send({success: false, msg: 'No token provided.'});
+  }
+});
+
+
+router.get('/:id', passport.authenticate('jwt', { session: false}), function(req, res,next) {
+    var token = getToken(req.headers);
+    if (token) {
+        var decoded = jwt.decode(token, config.secret);
+        User.findOne({
+            user_email: decoded.user_email
+        }, function(err, user) {
+            if (err) throw err;
+
+            if (!user) {
+                return res.status(403).send({success: false, msg: 'Authentication failed. User not found.'});
+            } else {
+              req.userinfo = user;
+              next();
+            }
+        });
+    } else {
+        return res.status(403).send({success: false, msg: 'No token provided.'});
+    }
+});
+
+router.get('/:id', function (req,res) {
+  if(req.userinfo._id == req.params.id) {
+    res.json({
+        success: true,
+        user_auth:true,
+        data: {
+          _id: req.userinfo._id,
+          name: req.userinfo.name,
+          img: req.userinfo.img,
+        }
+    });
+  }else{
+    res.json({
+      success: true,
+      user_auth:false,
+      data: {
+              _id: req.userinfo._id,
+              name: req.userinfo.name,
+              img: req.userinfo.img,
+      }
+    });
   }
 });
 

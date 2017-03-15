@@ -38,15 +38,20 @@ var InBoardSchema = new Schema({
         video_description:{
             type:String,
             maxlength:[3000, '説明文が長すぎです']
-        },
-        created_at: {
-            type: Date
         }
-});
+},
+    {
+        timestamps:
+            {
+                createdAt: 'created_at' ,
+                updatedAt: 'updated_at'
+            }
+    }
+);
 
 InBoardSchema.index({board_id: 1, video_id:1});
 InBoardSchema.index({_user:1, board_id:1});
-InBoardSchema.index({created_at: 1});
+InBoardSchema.index({created_at: -1});
 
 InBoardSchema.plugin(mongoosePaginate);
 

@@ -12,7 +12,7 @@ var bcrypt = require('bcrypt');
 var getToken = require('./cont/token');
 var paginate = require('express-paginate');
 var Video = require('../models/video');
-
+var Board = require('../models/board');
 
 router.use(passport.authenticate('jwt', { session: false}), function(req, res, next) {
 	var token = getToken(req.headers);
@@ -37,7 +37,7 @@ router.use(passport.authenticate('jwt', { session: false}), function(req, res, n
 router.get('/',function(req, res, next)  {
 	Video.paginate({},
 		{
-			select: 'url_id _user pattern title thumbnail favorite',
+			select: 'url_id _user title thumbnail favorite updated_at',
 			sort:{created_at:1},
 			populate: {path: '_user', select: '_id name img'},
 			page: req.query.page,
@@ -57,5 +57,6 @@ router.get('/',function(req, res, next)  {
 			}
 		})
 });
+
 
 module.exports = router;

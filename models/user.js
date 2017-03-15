@@ -30,15 +30,8 @@ var UserSchema = new Schema({
         maxlength: [100, 'パスワードが長すぎます'],
         required: [true, 'パスワードが記入されていません']
     },
-    created_at: {
-        type: Date
-    },
     img: {
         type: mongoose.SchemaTypes.Url
-    },
-    updated_at: {
-        type: Date,
-        default: Date.now
     },
     video: {
         type:Schema.Types.ObjectId, ref: 'Video'
@@ -49,7 +42,15 @@ var UserSchema = new Schema({
     inboard: {
         type:Schema.Types.ObjectId, ref: 'InBoard'
     },
-});
+},
+    {
+        timestamps:
+            {
+                createdAt: 'created_at' ,
+                updatedAt: 'updated_at'
+            }
+    }
+);
 
 UserSchema.pre('save', function (next) {
     var user = this;

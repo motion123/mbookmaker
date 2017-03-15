@@ -36,7 +36,6 @@ for(var i= 0;i <= 100; i++) {
     user.name= "test_name" + i;
     user.user_email= "test" + i + "@test.com";
     user.user_password = "tese_password" + i;
-    user.created_at = Date.now();
 
     user.save(function(err,success){
         if(err) console.log(err);
@@ -48,7 +47,6 @@ testUser = new User();
 testUser.name = "テストユーザ";
 testUser.user_email = "testpass@gmail.com";
 testUser.user_password = "testpass";
-testUser.created_at = Date.now();
 
 testUser.save(function(err,success){
     if(err) console.log(err);
@@ -67,7 +65,6 @@ function BoardData(success){
         board.title= "test_name" + i;
         board.user_email= "test" + i + "@test.com";
         board.user_password = "tese_password" + i;
-        board.created_at = Date.now();
 
         board.save(function(err,success){
             if(err) console.log(err);
@@ -84,11 +81,11 @@ function VideoData(success){
         var video = new Video();
 
         video._user = boarddata._user;
-        video.url_id = "N7OPZOBJZyI&" + Math.floor( Math.random() * 99999999 );
+        video.url_id = "j0h2u87JwyA&" + Math.floor( Math.random() * 99999999 );
+        video.url = "https://www.youtube.com/watch?v=j0h2u87JwyA";
         video.pattern = "YOUTUBE";
-        video.created_at = Date.now();
         video.title = "test" + i;
-        video.thumbnail = "https://i.ytimg.com/vi/kdm5Gb0soAU/hqdefault.jpg?" + i;
+        video.thumbnail = "https://i.ytimg.com/vi/j0h2u87JwyA/hqdefault.jpg?" + i;
         video.favorite = i;
         video.save(function(err,ok){
             if(err) console.log(err);
@@ -114,7 +111,6 @@ function InBoardData(success,boarddata) {
             inboard.url_id = success.url_id;
             inboard.video_title = "test" + Math.floor(Math.random() * 99999999);
             inboard.video_description = "test";
-            inboard.created_at = Date.now();
 
             inboard.save(function (err) {
                 if (err) console.log(err);

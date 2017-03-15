@@ -14,9 +14,10 @@ var getToken = require('./cont/token');
 var InBoard = require('../models/inboard');
 var Video = require('../models/video');
 var paginate = require('express-paginate');
+var mongoose = require('mongoose');
 
 
-router.get('/:id', passport.authenticate('jwt', {session: false}), function(req, res,next) {
+router.get('/:id/list', passport.authenticate('jwt', {session: false}), function(req, res,next) {
     var token = getToken(req.headers);
     if(token) {
         var decoded = jwt.decode(token, config.secret);
@@ -34,7 +35,7 @@ router.get('/:id', passport.authenticate('jwt', {session: false}), function(req,
     }
 });
 
-router.get('/:id', function(req,res,next) {
+router.get('/:id/list', function(req,res,next) {
    Board.findOne({
        _id:req.params.id
    },function (err,success) {
@@ -47,7 +48,7 @@ router.get('/:id', function(req,res,next) {
    })
 });
 
-router.get('/:id',function(req,res){
+router.get('/:id/list',function(req,res){
     InBoard.paginate({
             board_id: req.params.id
     }, {
@@ -96,7 +97,6 @@ router.post('/new',function (req,res) {
     board.title = req.body.title;
     board.description = req.body.description ? req.body.description : "";
     board.secret = req.body.secret;
-    board.created_at = Date.now();
 
     board.save(function(err) {
         if (err)
@@ -133,7 +133,6 @@ router.post('/edit', function (req,res) {
         title: req.body.title ? req.body.title : req.boardinfo.title,
         description: req.body.description ? req.body.description : req.boardinfo.description,
         secret: req.body.secret ? req.body.secret : req.boardinfo.secret,
-        updated_at: Date.now()
     },{ runValidators: true, context: 'query'},function (err, success) {
         if(err) {
             res.send(err);
@@ -161,6 +160,51 @@ router.delete('/:id/delete', passport.authenticate('jwt', { session: false}),fun
     } else {
         return res.status(403).send({success: false, msg: 'No token provided.'});
     }
+});
+
+
+
+router.get('/list', passport.authenticate('jwt', {session: false}), function(req, res,next) {
+    var token = getToken(req.headers);
+    if(token) {
+        var decoded = jwt.decode(token, config.secret);
+        User.findOne({
+            user_email: decoded.user_email
+        }, function (err, user) {
+            if(err) throw err;
+            if (!user) {
+                return res.status(403).send({success: false, msg: 'Authentication failed. User not found.'});
+            } else {
+                req.userinfo = user;
+                next();
+            }
+        })
+    }
+});
+
+
+
+router.get('/list',function(req, res)  {
+    Board.paginate({ _user: req.userinfo._id},
+        {
+            select: 'title description updated_at',
+            sort:{updated_at:-1},
+            page: req.query.page,
+            limit: req.query.limit
+        }, function(err,success) {
+            if(err) throw err;
+            if(!success) {
+                return res.status(404).send({success:false, msg: 'ボード一覧取得失敗'});
+            }else {
+                res.json({
+                    success:true,
+                    currentPage: success.page,
+                    pageCount: success.pages,
+                    itemCount: success.total,
+                    boards: success.docs
+                });
+            }
+        })
 });
 
 module.exports = router;

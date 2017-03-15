@@ -63,7 +63,6 @@ var allowCrossDomain = function(req, res, next) {
 };
 app.use(allowCrossDomain);
 
-
 app.use('/', index);
 app.use('/user', users);
 app.use('/api', api);

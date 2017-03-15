@@ -12,9 +12,14 @@ var Schema = mongoose.Schema;
 
 var VideoSchema = new Schema({
     url_id: {
-       type: String,
-       unique: true,
-       maxlength:[100,'URLが長すぎます']
+        type: String,
+        unique: true,
+        maxlength:[100,'URLが長すぎます']
+
+    },
+    url: {
+        type: mongoose.SchemaTypes.Url,
+        maxlength:[100,'URLが長すぎます']
     },
     pattern:{
         type: String,
@@ -33,17 +38,22 @@ var VideoSchema = new Schema({
     favorite: {
         type: Number,
         default: 0
-    },
-    created_at: {
-        type: Date
     }
-});
+},
+    {
+        timestamps:
+            {
+                createdAt: 'created_at' ,
+                updatedAt: 'updated_at'
+            }
+    }
+);
 
 VideoSchema.statics.increment = function(id, done) {
     return this.collection.findOneAndUpdate({
         _id: id,
     }, {
-        $inc: { favorite: 1 }
+        $inc: { favorite: 1 },
     }, {
         new: true,
         upsert: false
@@ -52,8 +62,8 @@ VideoSchema.statics.increment = function(id, done) {
     });
 };
 
-VideoSchema.index({created_at: 1});
-VideoSchema.index({favorite: 1});
+VideoSchema.index({created_at: -1});
+VideoSchema.index({favorite: -1});
 VideoSchema.index({url_id: 1, _user: 1},{unique: true});
 
 VideoSchema.plugin(uniqueValidator);

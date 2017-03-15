@@ -38,25 +38,29 @@ router.use(passport.authenticate('jwt', { session: false}), function(req, res, n
 
 router.post('/new', function (req,res,next) {
     var newVideo = new Video();
+    var pattern = "YOUTUBE"; //修正
     Video.findOne({
-        url_id: req.body.url_id
+        url_id: req.body.url_id,
+        pattern: pattern
     },function (err, video){
         if(err) throw err;
         if(!video) {
             // URL をパースする方法を考える
             newVideo.url_id = req.body.url_id;
             // pattern を取得する方法を考える
+            newVideo.pattern = pattern;
+            newVideo.url = req.body.url;
             newVideo._user = req.userinfo._id;
-            newVideo.created_at = new Date();
             newVideo.title = req.body.title;
             newVideo.thumbnail = req.body.thumbnail;
 
             newVideo.save(function (err,success) {
-                if(err)
+                if(err) {
                     res.status(403).send(err);
-                else
+                } else {
                     req.videoinfo = success;
                     next();
+                }
             });
         } else {
             req.videoinfo = video;
@@ -84,12 +88,14 @@ router.post('/new', function (req,res) {
             inboard.url_id = req.videoinfo.url_id;
             inboard.video_title = req.body.video_title;
             inboard.video_description = req.body.video_description ? req.body.video_description : "";
-            inboard.created_at = new Date();
 
             inboard.save(function (err, success) {
                 if (err)
                     res.status(403).send(err);
                 else
+                    Board.update(success.board_id,function (err,result) {
+                       console.log(result);//修正
+                    });
                     Video.increment(req.videoinfo._id,function(err, result) {
                         console.log(result);
                     });
@@ -100,14 +106,17 @@ router.post('/new', function (req,res) {
 });
 
 router.get('/:id', function (req,res) {
-   InBoard.findOne({video_id: req.params.id})
-       .sort({created_at: 1})
+   Video.findOne({_id: req.params.id})
+       .populate({path: '_user', select: '_id name img'})
        .exec(function (err, success){
         if(err) throw err;　
         if(!success) {
             return res.status(404).send({success: false, msg: 'Video not found'});
         } else {
-            res.send(success);
+            res.json({
+                success: true,
+                data:success
+            });
         }
        })
 });
