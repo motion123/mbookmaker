@@ -164,7 +164,7 @@ router.delete('/:id/delete', passport.authenticate('jwt', { session: false}),fun
 
 
 
-router.get('/list', passport.authenticate('jwt', {session: false}), function(req, res,next) {
+router.get('/list/:id', passport.authenticate('jwt', {session: false}), function(req, res,next) {
     var token = getToken(req.headers);
     if(token) {
         var decoded = jwt.decode(token, config.secret);
@@ -184,10 +184,10 @@ router.get('/list', passport.authenticate('jwt', {session: false}), function(req
 
 
 
-router.get('/list',function(req, res)  {
-    Board.paginate({ _user: req.userinfo._id},
+router.get('/list/:id',function(req, res)  {
+    Board.paginate({ _user: req.params.id},
         {
-            select: 'title description updated_at',
+            select: 'title description updated_at count',
             sort:{updated_at:-1},
             page: req.query.page,
             limit: req.query.limit

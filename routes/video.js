@@ -96,6 +96,9 @@ router.post('/new', function (req,res) {
                     Board.update(success.board_id,function (err,result) {
                        console.log(result);//修正
                     });
+                    Board.increment(success.board_id,function (err,result) {
+                       console.log(result);
+                    });
                     Video.increment(req.videoinfo._id,function(err, result) {
                         console.log(result);
                     });

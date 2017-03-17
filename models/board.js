@@ -35,6 +35,10 @@ var BoardSchema = new Schema({
         type: Number,
         min: 0,
         max: 35
+   },
+    count: {
+        type: Number,
+        default: 0,
     }
 },
     {
@@ -57,10 +61,24 @@ BoardSchema.statics.update = function(id, done) {
     });
 };
 
+
+BoardSchema.statics.increment = function(id, done) {
+    return this.collection.findOneAndUpdate({
+        _id: id,
+    }, {
+        $inc: { count: 1 },
+    }, {
+        new: true,
+        upsert: false
+    }, function(err, data) {
+        done(null, data);
+    });
+};
+
 BoardSchema.index({_user:1});
 BoardSchema.index({created_at: -1});
 BoardSchema.index({updated_at: -1});
-
+BoardSchema.index({count: -1});
 
 BoardSchema.plugin(uniqueValidator);
 BoardSchema.plugin(mongoosePaginate);
