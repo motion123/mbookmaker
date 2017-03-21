@@ -39,6 +39,9 @@ var BoardSchema = new Schema({
     count: {
         type: Number,
         default: 0,
+    },
+    img: {
+       type: mongoose.SchemaTypes.Url,
     }
 },
     {
@@ -50,11 +53,11 @@ var BoardSchema = new Schema({
     }
 );
 
-BoardSchema.statics.update = function(id, done) {
+BoardSchema.statics.update = function(id,url, done) {
     return this.collection.findOneAndUpdate({
         _id: id,
     }, {
-        $set: { updated_at: new Date() },
+        $set: { img: url },
     }, {
     }, function(err, data) {
         done(null, data);

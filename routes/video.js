@@ -93,7 +93,7 @@ router.post('/new', function (req,res) {
                 if (err)
                     res.status(403).send(err);
                 else
-                    Board.update(success.board_id,function (err,result) {
+                    Board.update(success.board_id,req.videoinfo.thumbnail,function (err,result) {
                        console.log(result);//修正
                     });
                     Board.increment(success.board_id,function (err,result) {

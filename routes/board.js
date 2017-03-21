@@ -62,6 +62,7 @@ router.get('/:id/list',function(req,res){
 	        return res.status(404).send({success: false, msg: 'Board not found'});
         }else {
             res.json({
+                success:true,
 	            currentPage: success.page,
                 pageCount: success.pages,
                 itemCount: success.total,
@@ -187,7 +188,7 @@ router.get('/list/:id', passport.authenticate('jwt', {session: false}), function
 router.get('/list/:id',function(req, res)  {
     Board.paginate({ _user: req.params.id},
         {
-            select: 'title description updated_at count',
+            select: 'title description updated_at count img',
             sort:{updated_at:-1},
             page: req.query.page,
             limit: req.query.limit

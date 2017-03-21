@@ -112,14 +112,14 @@ function InBoardData(success,boarddata) {
             inboard.video_title = "test" + Math.floor(Math.random() * 99999999);
             inboard.video_description = "test";
 
-            inboard.save(function (err,success) {
-                Board.update(success.board_id,function (err,result) {
+            inboard.save(function (err,ok) {
+                Board.update(ok.board_id,success.thumbnail,function (err,result) {
                     console.log(err);//修正
                 });
-                Board.increment(success.board_id,function (err,result) {
+                Board.increment(ok.board_id,function (err,result) {
                     console.log(err);
                 });
-                Video.increment(success.video_id,function(err, result) {
+                Video.increment(ok.video_id,function(err, result) {
                     console.log(err);
                 });
                 if (err) console.log(err);
