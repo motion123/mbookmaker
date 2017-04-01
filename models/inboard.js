@@ -6,7 +6,6 @@ require('mongoose-type-email');
 var mongoosePaginate = require('mongoose-paginate');
 var bcrypt = require('bcrypt');
 
-
 var Schema = mongoose.Schema;
 
 var InBoardSchema = new Schema({
@@ -24,7 +23,7 @@ var InBoardSchema = new Schema({
         },
         video_id: {
             type: Schema.Types.ObjectId,
-            required: [true, 'ビデオIDがありません']
+            required: [true, 'ビデオIDがありません'],
         },
         url_id: {
             type: String,
@@ -38,6 +37,12 @@ var InBoardSchema = new Schema({
         video_description:{
             type:String,
             maxlength:[3000, '説明文が長すぎです']
+        },
+        thumbnail: {
+            type: mongoose.SchemaTypes.Url,
+        },
+        pattern: {
+            type:String,
         }
 },
     {

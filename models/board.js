@@ -21,11 +21,11 @@ var BoardSchema = new Schema({
     title: {
         type: String,
         maxlength: [50, 'Too long'],
-        required: [true, 'board title is required']
+        required: [true, 'タイトルを入力してください']
    },
     description: {
         type: String,
-        maxlength:[1000, 'Too long']
+        maxlength:[1000, '説明文が長すぎです']
    },
    secret: {
         type: Boolean,
@@ -54,18 +54,22 @@ var BoardSchema = new Schema({
 );
 
 BoardSchema.statics.update = function(id,url, done) {
+    console.log(url);
     return this.collection.findOneAndUpdate({
         _id: id,
     }, {
         $set: { img: url },
     }, {
+        new: true,
+        upsert: false
     }, function(err, data) {
-        done(null, data);
+        done(err, data);
     });
 };
 
 
-BoardSchema.statics.increment = function(id, done) {
+BoardSchema.statics.increment = function(id,done) {
+    console.log(id);
     return this.collection.findOneAndUpdate({
         _id: id,
     }, {

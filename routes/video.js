@@ -14,6 +14,8 @@ var Board = require('../models/board');
 var InBoard = require('../models/inboard');
 var getToken = require('./cont/token');
 var paginate = require('express-paginate');
+var urlParser = require('../url/urlparse');
+var thumbnailCreator = require('../thumbnail/selector');
 
 
 router.use(passport.authenticate('jwt', { session: false}), function(req, res, next) {
@@ -38,17 +40,16 @@ router.use(passport.authenticate('jwt', { session: false}), function(req, res, n
 
 router.post('/new', function (req,res,next) {
     var newVideo = new Video();
-    var pattern = "YOUTUBE"; //修正
     Video.findOne({
         url_id: req.body.url_id,
-        pattern: pattern
+        pattern: req.body.pattern,
     },function (err, video){
-        if(err) throw err;
+        if(err) {
+            return res.status(400).send({success: false, msg: "MongoError" , error: err });
+        }
         if(!video) {
-            // URL をパースする方法を考える
             newVideo.url_id = req.body.url_id;
-            // pattern を取得する方法を考える
-            newVideo.pattern = pattern;
+            newVideo.pattern = req.body.pattern;
             newVideo.url = req.body.url;
             newVideo._user = req.userinfo._id;
             newVideo.title = req.body.title;
@@ -56,7 +57,7 @@ router.post('/new', function (req,res,next) {
 
             newVideo.save(function (err,success) {
                 if(err) {
-                    res.status(403).send(err);
+                    res.status(400).send({success: false, validError: true,error:err});
                 } else {
                     req.videoinfo = success;
                     next();
@@ -74,35 +75,69 @@ router.post('/new', function (req,res) {
         _user: req.userinfo._id,
         _id: req.body.board_id
     },function(err,board) {
-        if(err) throw err;
         if(!board) {
-            return res.status(403).send({success: false, msg: 'Authentication failed. Board not found.'});
+            return res.status(400).send({success: false, error: {errors: { board: err}},boardIdNotExist:true, msg: 'Board not found.'});
         } else {
             var inboard = new InBoard();
 
             inboard._user = req.userinfo._id;
             inboard.user_name = req.userinfo.name;
-            inboard.board_id = req.body.board_id;
+            inboard.board_id = board._id;
             inboard.board_title = board.title;
             inboard.video_id = req.videoinfo._id;
             inboard.url_id = req.videoinfo.url_id;
-            inboard.video_title = req.body.video_title;
-            inboard.video_description = req.body.video_description ? req.body.video_description : "";
+            inboard.video_title = req.body.title;
+            inboard.video_description = req.body.description ? req.body.description : "";
+            inboard.thumbnail = req.videoinfo.thumbnail;
+            inboard.pattern = req.videoinfo.pattern;
 
             inboard.save(function (err, success) {
-                if (err)
-                    res.status(403).send(err);
-                else
-                    Board.update(success.board_id,req.videoinfo.thumbnail,function (err,result) {
-                       console.log(result);//修正
+                if (err) {
+                    res.status(400).send({success: false, validError:true, error: err});
+                } else {
+                    Board.update(success.board_id, success.thumbnail, function (err, result) {
+                        console.log(result);//修正
                     });
-                    Board.increment(success.board_id,function (err,result) {
-                       console.log(result);
-                    });
-                    Video.increment(req.videoinfo._id,function(err, result) {
+                    Board.increment(success.board_id, function (err, result) {
                         console.log(result);
                     });
-                    res.status(200).send(success);
+                    Video.increment(success.video_id, function (err, result) {
+                        console.log(result);
+                    });
+                    res.json({
+                        success: true,
+                        video: success,
+                    });
+                }
+            })
+        }
+    })
+});
+
+router.get('/parse/:url',function(req,res,next) {
+    var mediaurl = decodeURIComponent(req.params.url);
+    req.mediaurl = mediaurl;
+    urlParser(mediaurl, function(err,params){
+        if(err){
+            return res.status(400).send({success: false, msg: 'URL Validation Error'});
+        } else {
+            req.urlinfo = params;
+            next();
+        }
+    })
+});
+
+router.get('/parse/:url',function(req,res) {
+    thumbnailCreator(req.urlinfo.pattern,req.urlinfo.id, function(err,url){
+        if(err) {
+            return res.status(400).send({success: false, msg: 'thumbnail not found'});
+        }else {
+            res.json({
+                success:true,
+                url_id:req.urlinfo.id,
+                pattern: req.urlinfo.pattern,
+                thumbnail: url,
+                url:req.mediaurl,
             })
         }
     })

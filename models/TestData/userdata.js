@@ -85,7 +85,7 @@ function VideoData(success){
         video.url = "https://www.youtube.com/watch?v=j0h2u87JwyA";
         video.pattern = "YOUTUBE";
         video.title = "test" + i;
-        video.thumbnail = "https://i.ytimg.com/vi/j0h2u87JwyA/hqdefault.jpg?" + i;
+        video.thumbnail = "http://i.ytimg.com/vi/N7OPZOBJZyI/mqdefault.jpg?" + i;
         video.favorite = i;
         video.save(function(err,ok){
             if(err) console.log(err);
@@ -111,16 +111,14 @@ function InBoardData(success,boarddata) {
             inboard.url_id = success.url_id;
             inboard.video_title = "test" + Math.floor(Math.random() * 99999999);
             inboard.video_description = "test";
-
+            inboard.thumbnail = success.thumbnail;
+            inboard.pattern = success.pattern;
             inboard.save(function (err,ok) {
                 Board.update(ok.board_id,success.thumbnail,function (err,result) {
-                    console.log(err);//修正
                 });
                 Board.increment(ok.board_id,function (err,result) {
-                    console.log(err);
                 });
                 Video.increment(ok.video_id,function(err, result) {
-                    console.log(err);
                 });
                 if (err) console.log(err);
             });

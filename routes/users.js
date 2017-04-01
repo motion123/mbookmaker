@@ -137,8 +137,20 @@ router.get('/:id', passport.authenticate('jwt', { session: false}), function(req
             if (!user) {
                 return res.status(403).send({success: false, msg: 'Authentication failed. User not found.'});
             } else {
-              req.userinfo = user;
-              next();
+                if(user._id == req.params.id){
+                    res.json({
+                        success: true,
+                        user_auth:true,
+                        data: {
+                            _id: user._id,
+                            name: user.name,
+                            img: user.img,
+                        }
+                    });
+                }else {
+                    req.userinfo = user;
+                    next();
+                }
             }
         });
     } else {
@@ -147,27 +159,26 @@ router.get('/:id', passport.authenticate('jwt', { session: false}), function(req
 });
 
 router.get('/:id', function (req,res) {
-  if(req.userinfo._id == req.params.id) {
-    res.json({
-        success: true,
-        user_auth:true,
-        data: {
-          _id: req.userinfo._id,
-          name: req.userinfo.name,
-          img: req.userinfo.img,
-        }
-    });
-  }else{
-    res.json({
-      success: true,
-      user_auth:false,
-      data: {
-              _id: req.userinfo._id,
-              name: req.userinfo.name,
-              img: req.userinfo.img,
-      }
-    });
-  }
+   User.findOne({
+       _id : req.params.id
+   },function(err,user){
+       if(err) throw err;
+
+       if(!user) {
+           return res.status(403).send({success: false, msg: 'User Not Found'});
+       }else {
+           res.json({
+               success: true,
+               user_auth: false,
+               data: {
+                   _id: user._id,
+                   name: user.name,
+                   img: user.img,
+               }
+           });
+       }
+   })
 });
+
 
 module.exports = router;

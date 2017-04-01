@@ -52,8 +52,8 @@ router.get('/:id/list',function(req,res){
     InBoard.paginate({
             board_id: req.params.id
     }, {
-	        select: 'created_at video_description video_title url_id video_id',
-	        sort:{created_at: 1},
+	        select: 'created_at video_description video_title url_id video_id thumbnail pattern',
+	        sort:{created_at: -1},
             page: req.query.page,
             limit: req.query.limit
     },function (err,success) {
@@ -66,7 +66,7 @@ router.get('/:id/list',function(req,res){
 	            currentPage: success.page,
                 pageCount: success.pages,
                 itemCount: success.total,
-                inBoardVideos: success.docs
+                videos: success.docs
             });
         }
     })
@@ -99,11 +99,18 @@ router.post('/new',function (req,res) {
     board.description = req.body.description ? req.body.description : "";
     board.secret = req.body.secret;
 
-    board.save(function(err) {
+    board.save(function(err,success) {
         if (err)
-            res.send(err);
+            res.status(400).json({
+                success:false,
+                error:err,
+            });
         else
-            res.json({ message: 'Board created!' });
+            res.json({
+                success: true,
+                message: 'Board created!',
+                data: success,
+            });
     })
 });
 
