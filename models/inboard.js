@@ -14,6 +14,9 @@ var InBoardSchema = new Schema({
             ref: 'User',
             required: [true, 'ユーザーIDがありません']
         },
+        user_id:{
+            type: String,
+        },
         board_id: {
             type: Schema.Types.ObjectId,
             required: [true, 'ボードIDがありません']

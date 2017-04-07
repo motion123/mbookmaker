@@ -18,6 +18,9 @@ var BoardSchema = new Schema({
        ref: 'User',
        required: [true, 'uuid is required']
    },
+    user_id: {
+        type: String,
+    },
     title: {
         type: String,
         maxlength: [50, 'Too long'],
@@ -69,7 +72,6 @@ BoardSchema.statics.update = function(id,url, done) {
 
 
 BoardSchema.statics.increment = function(id,done) {
-    console.log(id);
     return this.collection.findOneAndUpdate({
         _id: id,
     }, {
@@ -81,6 +83,20 @@ BoardSchema.statics.increment = function(id,done) {
         done(null, data);
     });
 };
+
+BoardSchema.statics.decrement = function(id,done) {
+    return this.collection.findOneAndUpdate({
+        _id: id,
+    }, {
+        $inc: { count: -1 },
+    }, {
+        new: true,
+        upsert: false
+    }, function(err, data) {
+        done(null, data);
+    });
+};
+
 
 BoardSchema.index({_user:1});
 BoardSchema.index({created_at: -1});

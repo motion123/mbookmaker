@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/jsonAPI', { config: { autoIndex: false } });
+mongoose.connect('mongodb://localhost/jsonAPI', { config: { autoIndex: true } });
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -18,6 +18,8 @@ var authenticate = require('./routes/authenticate');
 var board = require('./routes/board');
 var video = require('./routes/video');
 var list = require('./routes/list');
+var follow = require('./routes/follow');
+var comment = require('./routes/comment');
 
 var app = express();
 
@@ -70,7 +72,8 @@ app.use('/auth', authenticate);
 app.use('/board', board);
 app.use('/video', video);
 app.use('/list', list);
-
+app.use('/follow', follow);
+app.use('/comment', comment);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

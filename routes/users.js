@@ -13,6 +13,7 @@ router.post('/new', function(req, res) {
   var user = new User();
 
   user.name = req.body.name;
+  user.user_id = req.body.user_id;
   user.user_email = req.body.user_email;
   user.user_password = req.body.user_password;
 
@@ -72,7 +73,8 @@ router.post('/edit', function(req, res,next) {
 router.post('/edit', function(req,res){
   User.findOneAndUpdate({_id: req.userinfo._id},{
     name: req.body.name ? req.body.name : req.userinfo.name,
-    user_email: req.userinfo.user_email,
+    user_id: req.body.user_id ? req.body.user_id: req.userinfo.name,
+      user_email: req.userinfo.user_email,
     user_password: req.body.user_password ? req.cryptpass : requser.user_password,
     img: req.body.img ? req.body.img : req.userinfo.img ? req.userinfo.img : ""
   },{ runValidators: true, context: 'query'},function (err, success) {
@@ -137,7 +139,7 @@ router.get('/:id', passport.authenticate('jwt', { session: false}), function(req
             if (!user) {
                 return res.status(403).send({success: false, msg: 'Authentication failed. User not found.'});
             } else {
-                if(user._id == req.params.id){
+                if(user.user_id == req.params.id){
                     res.json({
                         success: true,
                         user_auth:true,
@@ -145,6 +147,7 @@ router.get('/:id', passport.authenticate('jwt', { session: false}), function(req
                             _id: user._id,
                             name: user.name,
                             img: user.img,
+                            user_id: user.user_id,
                         }
                     });
                 }else {
@@ -160,10 +163,10 @@ router.get('/:id', passport.authenticate('jwt', { session: false}), function(req
 
 router.get('/:id', function (req,res) {
    User.findOne({
-       _id : req.params.id
+       user_id : req.params.id
    },function(err,user){
-       if(err) throw err;
-
+       if(err)
+           return res.status(403).send({success: false, msg: 'User Not Found'});
        if(!user) {
            return res.status(403).send({success: false, msg: 'User Not Found'});
        }else {

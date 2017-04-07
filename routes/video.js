@@ -81,6 +81,7 @@ router.post('/new', function (req,res) {
             var inboard = new InBoard();
 
             inboard._user = req.userinfo._id;
+            inboard.user_id = req.userinfo.user_id;
             inboard.user_name = req.userinfo.name;
             inboard.board_id = board._id;
             inboard.board_title = board.title;
@@ -145,7 +146,7 @@ router.get('/parse/:url',function(req,res) {
 
 router.get('/:id', function (req,res) {
    Video.findOne({_id: req.params.id})
-       .populate({path: '_user', select: '_id name img'})
+       .populate({path: '_user', select: '_id name img user_id'})
        .exec(function (err, success){
         if(err) throw err;　
         if(!success) {
@@ -184,16 +185,43 @@ router.get('/:id/info', function(req,res){
    })
 });
 
-router.post('/delete',function(req,res){
+router.delete('/:id/delete',function(req,res,next) {
+    InBoard.findOne({
+        _user: req.userinfo._id,
+        _id: req.params.id,
+    }, function (err, success) {
+        if (err) {
+            res.status(403).json({success: false, error: err});
+        }else if(success) {
+            req.boardinfo = success;
+            next();
+        } else {
+            res.status(403).json({success: false, message: "Not Found"});
+        }
+    });
+
+});
+
+router.delete('/:id/delete',function(req,res) {
     InBoard.remove({
       _user: req.userinfo._id,
-      board_id: req.body.board_id,
-      video_id: req.body.video_id
+      _id: req.params.id,
     },function (err, success) {
         if (err)
-            res.status(403).send(err);
-        else
-            res.json({message: "video deleted"});
+            res.status(403).json({success:false,error:err});
+        else if(success)
+            Board.decrement(req.boardinfo.board_id, function (err, result) {
+                console.log(result);
+            });
+            res.json({
+                success:true,
+                message: "video deleted",
+                video: {
+                    video_title: req.boardinfo.video_title,
+                    board_title: req.boardinfo.board_title,
+                }
+            });
+
     })
 });
 

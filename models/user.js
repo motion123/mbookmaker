@@ -15,20 +15,28 @@ var UserSchema = new Schema({
         type: String,
         minlength: [2, '名前が短すぎます'],
         maxlength: [15, '名前が長すぎです'],
-        required: [true, '名前が記入されていません']
+        required: [true, '名前が入力されていません']
+    },
+    user_id: {
+        type:String,
+        minlength: [2, 'idが短すぎます'],
+        maxlength: [15, 'idが長すぎです'],
+        required: [true, 'idが入力されていません'],
+        unique: true,
+        lowercase: true
     },
     user_email: {
         type: mongoose.SchemaTypes.Email,
         minlength: [6, 'メールアドレスが短すぎます'],
         maxlength: [100, 'メールアドレスが長すぎです'],
-        required: [true, 'メールアドレスが記入されていません'],
+        required: [true, 'メールアドレスが入力されていません'],
         unique: true
     },
     user_password: {
         type: String,
         minlength: [8, 'パスワードが短すぎます'],
         maxlength: [100, 'パスワードが長すぎます'],
-        required: [true, 'パスワードが記入されていません']
+        required: [true, 'パスワードが入力されていません']
     },
     img: {
         type: mongoose.SchemaTypes.Url
@@ -42,6 +50,12 @@ var UserSchema = new Schema({
     inboard: {
         type:Schema.Types.ObjectId, ref: 'InBoard'
     },
+	follow: {
+		type:Schema.Types.ObjectId, ref: 'Follow'
+	},
+	comment: {
+		type:Schema.Types.ObjectId, ref: 'Comment'
+	},
 },
     {
         timestamps:

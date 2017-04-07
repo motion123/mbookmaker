@@ -40,7 +40,10 @@ var VideoSchema = new Schema({
     favorite: {
         type: Number,
         default: 0
-    }
+    },
+    comment: {
+       type:Schema.Types.ObjectId, ref: 'Comment'
+    },
 },
     {
         timestamps:
@@ -67,6 +70,7 @@ VideoSchema.statics.increment = function(id, done) {
 VideoSchema.index({created_at: -1});
 VideoSchema.index({favorite: -1});
 VideoSchema.index({url_id: 1, _user: 1},{unique: true});
+VideoSchema.index({_user: 1});
 
 VideoSchema.plugin(uniqueValidator);
 

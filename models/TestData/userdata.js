@@ -5,6 +5,8 @@ require('../../config/passport')(passport);
 var Video = require('../../models/video');
 var Board = require('../../models/board');
 var InBoard = require('../../models/inboard');
+var Comment = require('../../models/comment');
+var Follow = require('../../models/follow');
 
 /* GET users listing. */
 
@@ -30,54 +32,72 @@ InBoard.remove({},function(err){
 
 
 
-for(var i= 0;i <= 100; i++) {
-    var user = new User();
-
-    user.name= "test_name" + i;
-    user.user_email= "test" + i + "@test.com";
-    user.user_password = "tese_password" + i;
-
-    user.save(function(err,success){
-        if(err) console.log(err);
-    });
-}
-
 testUser = new User();
 
-testUser.name = "テストユーザ";
+testUser.name = "tomihei";
 testUser.user_email = "testpass@gmail.com";
 testUser.user_password = "testpass";
-
+testUser.user_id = "test_user";
 testUser.save(function(err,success){
     if(err) console.log(err);
     if(success){
         BoardData(success);
+
     }
 });
 
-console.log("Test User Data Inserted");
+
+function FollowData(success,board) {
+    var follow = new Follow();
+    follow.followee = board._user;
+    follow.follower = success._id;
+    follow.follow_board = board._id;
+
+    follow.save(function (err) {
+        if(err) console.log(err);
+    })
+}
+
+
 
 function BoardData(success){
-    for(var i= 0;i <= 100; i++) {
+    for(var i= 0;i <= 50; i++) {
         var board = new Board();
 
         board._user = success._id;
+        board.user_id = success.user_id;
         board.title= "test_name" + i;
         board.user_email= "test" + i + "@test.com";
         board.user_password = "tese_password" + i;
 
         board.save(function(err,success){
+            var board = success;
             if(err) console.log(err);
-            if(success) VideoData(success);
+            var user = new User();
+
+            user.name = success.title;
+            user.user_email = success.user_email;
+            user.user_id = "test" + + Math.floor( Math.random() * 99999999 );
+            user.user_password = success.user_password;
+
+
+            user.save(function (err, success) {
+                if (err) console.log(err);
+                if (success) {
+                    FollowData(success,board);
+                    VideoData(board,success);
+                }
+            });
         });
     }
 }
 
 
 
-function VideoData(success){
-    var boarddata = success;
-    for(var i= 0;i <= 100; i++) {
+function VideoData(board,user){
+    var boarddata = board;
+    var userData = user;
+    for(var i= 0;i <= 50; i++) {
         var video = new Video();
 
         video._user = boarddata._user;
@@ -85,14 +105,26 @@ function VideoData(success){
         video.url = "https://www.youtube.com/watch?v=j0h2u87JwyA";
         video.pattern = "YOUTUBE";
         video.title = "test" + i;
-        video.thumbnail = "http://i.ytimg.com/vi/N7OPZOBJZyI/mqdefault.jpg?" + i;
+        video.thumbnail = "http://i.ytimg.com/vi/N7OPZOBJZyI/mqdefault.jpg";
         video.favorite = i;
         video.save(function(err,ok){
             if(err) console.log(err);
-            if(ok) InBoardData(ok,boarddata);
+            if(ok) {
+                CommentData(userData,ok);
+                InBoardData(ok,boarddata);
+            }
         });
     }
-    console.log("VideoData Inserted");
+}
+
+function CommentData(user,video){
+    var comment = new Comment();
+    comment.video_id = video._id;
+    comment.comment = "moimoimoimoimoimoimoimoi";
+    comment.user_id = user._id;
+    comment.save(function (err) {
+        if(err) console.log(err);
+    })
 }
 
 function InBoardData(success,boarddata) {
@@ -101,8 +133,7 @@ function InBoardData(success,boarddata) {
         _id: success._user
     }, function (err, ok) {
         if (err) throw err;
-        for(var i=0; i <= 30; i++) {
-            console.log(success._id);
+        for(var i=0; i <= 25; i++) {
             inboard._user = success._user;
             inboard.user_name = ok.name;
             inboard.board_id = boarddata._id;
@@ -114,16 +145,18 @@ function InBoardData(success,boarddata) {
             inboard.thumbnail = success.thumbnail;
             inboard.pattern = success.pattern;
             inboard.save(function (err,ok) {
-                Board.update(ok.board_id,success.thumbnail,function (err,result) {
-                });
-                Board.increment(ok.board_id,function (err,result) {
-                });
-                Video.increment(ok.video_id,function(err, result) {
-                });
-                if (err) console.log(err);
+                if (err) {
+                    console.log(err);
+                }else {
+                    Board.update(ok.board_id, success.thumbnail, function (err, result) {
+                    });
+                    Board.increment(ok.board_id, function (err, result) {
+                    });
+                    Video.increment(ok.video_id, function (err, result) {
+                    });
+                }
             });
         }
     });
 
-    console.log("Test Inboard Data Inserted");
 }

@@ -27,7 +27,8 @@ router.get('/', passport.authenticate('jwt', {session: false}) ,function (req,re
                 return res.json({
                     msg: "auth success",
                     success: true,
-                    id: user._id,
+                    _id: user._id,
+                    user_id: user.user_id,
                 })
             }
         })

@@ -41,7 +41,7 @@ router.get('/:id/list', function(req,res,next) {
    },function (err,success) {
        if(err) throw err;
        if(!success){
-           return res.status(403).send({msg: 'Board not found.'});
+           return res.status(403).send({success:false,msg: 'Board not found.'});
        } else{
            next();
        }
@@ -52,7 +52,7 @@ router.get('/:id/list',function(req,res){
     InBoard.paginate({
             board_id: req.params.id
     }, {
-	        select: 'created_at video_description video_title url_id video_id thumbnail pattern',
+	        select: 'created_at user_id video_description video_title url_id video_id thumbnail pattern',
 	        sort:{created_at: -1},
             page: req.query.page,
             limit: req.query.limit
@@ -96,6 +96,7 @@ router.post('/new',function (req,res) {
 
     board._user = req.userinfo._id;
     board.title = req.body.title;
+    board.user_id = req.userinfo.user_id;
     board.description = req.body.description ? req.body.description : "";
     board.secret = req.body.secret;
 
@@ -193,9 +194,9 @@ router.get('/list/:id', passport.authenticate('jwt', {session: false}), function
 
 
 router.get('/list/:id',function(req, res)  {
-    Board.paginate({ _user: req.params.id},
+    Board.paginate({ user_id: req.params.id},
         {
-            select: 'title description updated_at count img',
+            select: 'title description user_id updated_at count img',
             sort:{updated_at:-1},
             page: req.query.page,
             limit: req.query.limit
