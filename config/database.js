@@ -3,5 +3,5 @@
  */
 module.exports = {
     'secret': 'devdacticIsAwesome',
-    'database': 'mongodb://localhost/node-rest-auth'
+    'database': process.env.MONGODB_URI,
 };
