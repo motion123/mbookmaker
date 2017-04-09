@@ -9,9 +9,8 @@ var bodyParser = require('body-parser');
 
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/jsonAPI', { config: { autoIndex: true } });
+mongoose.connect(process.env.MONGODB_URI);
 
-var index = require('./routes/index');
 var users = require('./routes/users');
 var api = require('./routes/api');
 var authenticate = require('./routes/authenticate');
@@ -65,7 +64,6 @@ var allowCrossDomain = function(req, res, next) {
 };
 app.use(allowCrossDomain);
 
-app.use('/', index);
 app.use('/user', users);
 app.use('/api', api);
 app.use('/auth', authenticate);
