@@ -29,9 +29,10 @@ var CommentSchema = new Schema({
 			type: Boolean,
 			default: false,
 		},
-		res_id: {
+		res_id: [{
 			type: Schema.Types.ObjectId,
-		}
+			ref: 'Comment',
+		}]
 	},
 	{
 		timestamps:
@@ -41,6 +42,20 @@ var CommentSchema = new Schema({
 		}
 	}
 );
+
+CommentSchema.statics.update = function(id,resId, done) {
+	return this.findOneAndUpdate({
+		_id: id,
+	}, {
+		$push: { res_id: resId },
+	}, {
+		safe: true,
+		new: true,
+		upsert: false
+	}, function(err, data) {
+		done(err, data);
+	});
+};
 
 CommentSchema.index({video_id:1, created_at: -1});
 CommentSchema.index({_user:1, video_id:1});

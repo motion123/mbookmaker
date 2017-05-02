@@ -39,11 +39,11 @@ router.use(passport.authenticate('jwt', { session: false}), function(req, res, n
 router.post('/new', function(req, res,next) {
 	Video.findOne({
 		_id: req.body.video_id
-	},function (err, user) {
+	},function (err, video) {
 		if(err) {
 			return res.status(403).send({success: false, error: err})
-		} else if(!user) {
-			return res.status(404).send({success:false, msg: 'follower Not Found,'})
+		} else if(!video) {
+			return res.status(404).send({success:false, msg: 'video Not Found,'})
 		} else{
 			next();
 		}
@@ -57,24 +57,30 @@ router.post('/new', function(req, res) {
 	comment.user_id = req.userinfo._id;
 	comment.comment = req.body.comment;
 	comment.video_id = req.body.video_id;
-	comment.res_id = req.body.res_id;
-	comment.res = req.body.res;
+	comment.res = req.body.res ? req.body.res : false;
 	comment.save(function(err,success) {
 		if (err) {
 			res.json({success:false,error: err});
 		} else if(success){
-			res.json({success: true, data:success});
+			Comment.update(req.body.res_id,success._id,function(err, result){
+				console.log(err);
+				console.log(result);
+				if(!err){
+					res.json({success: true, data:success});
+				}
+			});
 		}
 	})
 });
 
 router.get('/:id', function(req,res) {
 	Comment.paginate({
-		video_id: req.params.id
+		video_id: req.params.id,
+		res: false,
 	},{
 		select: 'user_id res res_id comment video_id created_at',
 		sort:{created_at:-1},
-		populate: {path: 'user_id', select: 'user_id name img'},
+		populate: {path: 'user_id res_id', select: 'user_id name img res res_id comment video_id created_at'},
 		page: req.query.page,
 		limit: 10,
 	},function(err,success){
