@@ -63,7 +63,7 @@ router.post('/new', function(req, res) {
 		if (err) {
 			res.status(403).send({success:false,error: err});
 		} else if(success){
-			res.json({success: true});
+			res.json({success: true,board: success.follow_board});
 		}
 	})
 });
@@ -89,7 +89,7 @@ router.get('/er/:id', function(req,res) {
 				currentPage: success.page,
 				pageCount: success.pages,
 				itemCount: success.total,
-				follower: success.docs
+				followdata: success.docs
 			});
 		}
 	})
@@ -115,7 +115,7 @@ router.get('/ee/:id', function (req,res) {
 				currentPage: success.page,
 				pageCount: success.pages,
 				itemCount: success.total,
-				followee: success.docs
+				followdata: success.docs
 			});
 		}
 	})
@@ -141,16 +141,52 @@ router.get('/board/:id', function (req,res) {
 				currentPage: success.page,
 				pageCount: success.pages,
 				itemCount: success.total,
-				followee: success.docs
+				followdata: success.docs
 			});
 		}
 	})
 });
 
-router.delete('board/:id',function (req,res) {
+router.get('/er/board/:id',function (req,res) {
+	Follow.findOne({
+		follower: req.userinfo._id,
+		follow_board: req.params.id
+	},function(err,success){
+		if(err){ throw err}
+		if(!success){
+			res.json({success: false, message:"ボードがフォローされていません"})
+		}else{
+			res.json({
+				success:true,
+				follow_board:success.follow_board,
+				message:"フォローされています"
+			})
+		}
+	})
+});
+
+router.get('/er/user/:id',function (req,res) {
+	Follow.findOne({
+		follower: req.userinfo._id,
+		followee: req.params.id
+	},function(err,success){
+		if(err){ throw err}
+		if(!success){
+			res.json({success: false, message:"ユーザーがフォローされていません"})
+		}else{
+			res.json({
+				success:true,
+				followee: success.followee,
+				message:"フォローされています"
+			})
+		}
+	})
+});
+
+router.delete('/board/:id',function (req,res) {
 	Follow.remove({
-		followee: req.userinfo._id,
-		board_id: req.params.id
+		follower: req.userinfo._id,
+		follow_board: req.params.id
 	},function(err,success){
 		if(err){
 			res.json({success:false,error: err});
@@ -160,10 +196,10 @@ router.delete('board/:id',function (req,res) {
 	})
 });
 
-router.delete('user/:id',function (req,res) {
+router.delete('/user/:id',function (req,res) {
 	Follow.remove({
-		followee: req.userinfo._id,
-		follower: req.params.id
+		follower: req.userinfo._id,
+		followee: req.params.id
 	},function(err,success){
 		if(err){
 			res.json({success:false,error: err});
