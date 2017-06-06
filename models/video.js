@@ -29,6 +29,10 @@ var VideoSchema = new Schema({
         required: [true, 'タイトルを入力してください'],
         maxlength:[100, 'タイトルが長すぎです'],
     },
+    description:{
+        type:String,
+        maxlength:[5000, '説明文が長すぎです']
+    },
     _user: {
         type: Schema.Types.ObjectId,
         required: [true, 'ユーザーIDが必要です'],

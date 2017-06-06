@@ -35,7 +35,7 @@ var FollowSchema = new Schema({
 );
 
 FollowSchema.index({followee:1,follower: 1});
-FollowSchema.index({followee:1,follow_board: 1},{unique: true});
+FollowSchema.index({follower:1,follow_board: 1}, {unique: true});
 FollowSchema.index({followee:1});
 FollowSchema.index({follower:1});
 FollowSchema.index({created_at: -1});

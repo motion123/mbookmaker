@@ -62,13 +62,17 @@ router.post('/new', function(req, res) {
 		if (err) {
 			res.json({success:false,error: err});
 		} else if(success){
-			Comment.update(req.body.res_id,success._id,function(err, result){
-				console.log(err);
-				console.log(result);
-				if(!err){
-					res.json({success: true, data:success});
-				}
-			});
+			if(req.body.res) {
+				Comment.update(req.body.res_id, success._id, function (err, result) {
+					console.log(err);
+					console.log(result);
+					if (!err) {
+						res.json({success: true, data: success});
+					}
+				});
+			}else {
+				res.json({success: true, data:success});
+			}
 		}
 	})
 });
@@ -80,7 +84,7 @@ router.get('/:id', function(req,res) {
 	},{
 		select: 'user_id res res_id comment video_id created_at',
 		sort:{created_at:-1},
-		populate: {path: 'user_id res_id', select: 'user_id name img res res_id comment video_id created_at'},
+		populate: {path: 'res_id user_id', select: 'user_id name img res res_id comment video_id created_at'},
 		page: req.query.page,
 		limit: 10,
 	},function(err,success){
@@ -97,7 +101,7 @@ router.get('/:id', function(req,res) {
 				comments: success.docs
 			});
 		}
-	})
+	});
 });
 
 router.delete('/:id',function (req,res) {

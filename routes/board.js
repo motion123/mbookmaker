@@ -191,15 +191,31 @@ router.get('/list/:id', passport.authenticate('jwt', {session: false}), function
     }
 });
 
+router.get('/:id',function (req,res) {
+   Board.findOne(
+       {
+           _id: req.params.id
+       }, function (err,success) {
+           if(err) throw err;
+           if(!success){
+               return res.status(404).send({success:false, msg: 'ボード情報取得失敗'});
+           }else{
+               res.json({
+                   success:true,
+                   data:success,
+               })
+           }
+   })
+});
 
 
 router.get('/list/:id',function(req, res)  {
     Board.paginate({ user_id: req.params.id},
         {
-            select: 'title description user_id updated_at count img',
+            select: '_user title description user_id updated_at count img',
             sort:{updated_at:-1},
             page: req.query.page,
-            limit: req.query.limit
+            limit: 10
         }, function(err,success) {
             if(err) throw err;
             if(!success) {

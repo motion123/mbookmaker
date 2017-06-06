@@ -54,6 +54,7 @@ router.post('/new', function (req,res,next) {
             newVideo._user = req.userinfo._id;
             newVideo.title = req.body.title;
             newVideo.thumbnail = req.body.thumbnail;
+            newVideo.description = req.body.description;
 
             newVideo.save(function (err,success) {
                 if(err) {
