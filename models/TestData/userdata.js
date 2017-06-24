@@ -103,6 +103,7 @@ function VideoData(board,user){
         video._user = boarddata._user;
         video.url_id = "j0h2u87JwyA&" + Math.floor( Math.random() * 99999999 );
         video.url = "https://www.youtube.com/watch?v=j0h2u87JwyA";
+        video.description = "testtesttest";
         video.pattern = "YOUTUBE";
         video.title = "test" + i;
         video.thumbnail = "http://i.ytimg.com/vi/N7OPZOBJZyI/mqdefault.jpg";

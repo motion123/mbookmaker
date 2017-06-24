@@ -57,7 +57,6 @@ var BoardSchema = new Schema({
 );
 
 BoardSchema.statics.update = function(id,url, done) {
-    console.log(url);
     return this.collection.findOneAndUpdate({
         _id: id,
     }, {

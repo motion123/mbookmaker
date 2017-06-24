@@ -70,55 +70,77 @@ router.post('/new', function(req, res) {
 
 
 router.get('/er/:id', function(req,res) {
-	Follow.paginate({
-		followee: req.params.id
-	},{
-		select: 'follower follow_board',
-		sort:{created_at:1},
-		populate: {path: 'follower follow_board', select: '_id name img title user_id '},
-		page: req.query.page,
-		limit: req.query.limit
-	},function(err,success){
-		if(err){
-			return res.status(404).send({success:false, msg: 'follower取得失敗'});
-		} else if(!success) {
-			return res.status(404).send({success:false, msg: 'follower取得失敗'});
-		}else {
-			res.json({
-				success:true,
-				currentPage: success.page,
-				pageCount: success.pages,
-				itemCount: success.total,
-				followdata: success.docs
-			});
-		}
-	})
+	Follow.find({followee: req.params.id})
+		.distinct("follower", (err,ids)=>{
+			User.paginate({'_id':{$in : ids}},{
+				select:'_id name img title user_id',
+				page: req.query.page,
+				limit: req.query.limit
+			},function (err,success) {
+				if(err){
+					return res.status(404).send({success:false, msg: 'follower取得失敗'});
+				} else if(!success) {
+					return res.status(404).send({success: false, msg: 'follower取得失敗'});
+				}else {
+					res.json({
+						success: true,
+						currentPage: success.page,
+						pageCount: success.pages,
+						itemCount: success.total,
+						followdata: success.docs
+					});
+				}
+			})
+		})
 });
 
+
 router.get('/ee/:id', function (req,res) {
-	Follow.paginate({
-		follower: req.params.id
-	},{
-		select: 'followee follow_board',
-		sort:{created_at:1},
-		populate: {path: 'followee follow_board', select: '_id name img title user_id'},
-		page: req.query.page,
-		limit: req.query.limit
-	},function(err,success){
-		if(err){
-			return res.status(404).send({success:false, msg: 'followee取得失敗'});
-		} else if(!success) {
-			return res.status(404).send({success:false, msg: 'followee取得失敗'});
-		}else {
-			res.json({
-				success:true,
-				currentPage: success.page,
-				pageCount: success.pages,
-				itemCount: success.total,
-				followdata: success.docs
+	Follow.find({follower: req.params.id})
+		.distinct("followee", (err,ids)=>{
+			User.paginate({'_id':{$in : ids}},{
+				select:'_id name img title user_id',
+				page: req.query.page,
+				limit: req.query.limit
+			},function (err,success) {
+				if(err){
+					return res.status(404).send({success:false, msg: 'followee取得失敗'});
+				} else if(!success) {
+					return res.status(404).send({success: false, msg: 'followee取得失敗'});
+				}else {
+					res.json({
+						success: true,
+						currentPage: success.page,
+						pageCount: success.pages,
+						itemCount: success.total,
+						followdata: success.docs
+					});
+				}
 			});
-		}
-	})
+	});
+	// Follow.paginate({
+	// 	follower: req.params.id
+	// },{
+	// 	select: 'followee follow_board',
+	// 	sort:{created_at:1},
+	// 	populate: {path: 'followee follow_board', select: '_id name img title user_id'},
+	// 	page: req.query.page,
+	// 	limit: req.query.limit
+	// },function(err,success){
+	// 	if(err){
+	// 		return res.status(404).send({success:false, msg: 'followee取得失敗'});
+	// 	} else if(!success) {
+	// 		return res.status(404).send({success:false, msg: 'followee取得失敗'});
+	// 	}else {
+	// 		res.json({
+	// 			success:true,
+	// 			currentPage: success.page,
+	// 			pageCount: success.pages,
+	// 			itemCount: success.total,
+	// 			followdata: success.docs
+	// 		});
+	// 	}
+	// })
 });
 
 router.get('/board/:id', function (req,res) {

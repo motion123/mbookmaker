@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 require('mongoose-type-email');
 require('mongoose-type-url');
 var bcrypt = require('bcrypt');
+var mongoosePaginate = require('mongoose-paginate');
 
 var uniqueValidator = require('mongoose-unique-validator');
 
@@ -96,5 +97,6 @@ UserSchema.methods.comparePassword = function (passw, cb) {
 };
 
 UserSchema.plugin(uniqueValidator,{message: "登録済みのメールアドレスです"});
+UserSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('User', UserSchema);

@@ -20,6 +20,7 @@ var video = require('./routes/video');
 var list = require('./routes/list');
 var follow = require('./routes/follow');
 var comment = require('./routes/comment');
+var search = require('./routes/search');
 
 var app = express();
 
@@ -74,6 +75,7 @@ app.use('/video', video);
 app.use('/list', list);
 app.use('/follow', follow);
 app.use('/comment', comment);
+app.use('/search', search);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

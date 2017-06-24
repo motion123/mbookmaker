@@ -167,7 +167,7 @@ router.get('/:id/info', function(req,res){
    }, {
         select: '_user board_id board_title created_at',
         sort: { created_at: 1},
-        populate: {path: '_user', select: '_id name'},
+        populate: {path: '_user', select: '_id name user_id'},
         page: req.query.page,
         limit: req.query.limit
    }, function(err, success) {
