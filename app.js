@@ -21,6 +21,7 @@ var list = require('./routes/list');
 var follow = require('./routes/follow');
 var comment = require('./routes/comment');
 var search = require('./routes/search');
+var recommend = require('./routes/recommend');
 
 var app = express();
 
@@ -76,6 +77,7 @@ app.use('/list', list);
 app.use('/follow', follow);
 app.use('/comment', comment);
 app.use('/search', search);
+app.use('/recommend', recommend);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

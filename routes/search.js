@@ -9,17 +9,16 @@ var User = require('../models/user');
 var passport = require('passport');
 require('../config/passport')(passport);
 var bcrypt = require('bcrypt');
-var Video = require('../models/video');
-var Board = require('../models/board');
-var InBoard = require('../models/inboard');
 var getToken = require('./cont/token');
 var paginate = require('express-paginate');
 var elasticsearch = require('es');
+var SearchWord = require('../models/searchquery');
 
 var config1 = {
 	_index: 'video',
 	_type:'videos'
 };
+
 es = elasticsearch(config1);
 
 router.use(passport.authenticate('jwt', { session: false}), function(req, res, next) {
@@ -43,6 +42,7 @@ router.use(passport.authenticate('jwt', { session: false}), function(req, res, n
 });
 
 router.get('/video/:word',function (req,res,next) {
+	var page = (req.query.page - 1) * 20;
 	es.search({
 		query: {
 			has_child: {
@@ -64,23 +64,45 @@ router.get('/video/:word',function (req,res,next) {
 				}
 			],
 			size: 20,
-			from: req.query.page - 1
+			from: page
 	}, function (err, data) {
 		if(!err) {
 			var currentPage = req.query.page;
 			var pageCount = data.hits.total > 20 ? (Math.floor(data.hits.total / 20) + 1) :(1);
+			var videolist = [];
+			if(data.hits.total != 0) {
+                videolist = data.hits.hits.map(function (idx) {
+                    return idx._source;
+                });
+            }
 			res.json(
 				{
 					success:true,
 					currentPage:currentPage,
 					pageCount: pageCount,
-					data: data.hits.hits
+					data: videolist
 				}
-				);
+			);
+
+			next();
+
 		}else {
 			res.json({success:false, data:err})
 		}
 	});
 });
+
+router.get('/video/:word',function (req,res) {
+	if(req.query.page == 1){
+        SearchWord.push(req.userinfo._id,req.params.word,function(err,data){
+            if(data.word.length > 10) {
+                SearchWord.pop(req.userinfo._id,function (err,data) {
+                    console.log(err);
+                })
+            }
+        })
+	}
+});
+
 
 module.exports = router;

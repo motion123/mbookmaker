@@ -149,8 +149,9 @@ router.get('/:id', function (req,res) {
    Video.findOne({_id: req.params.id})
        .populate({path: '_user', select: '_id name img user_id'})
        .exec(function (err, success){
-        if(err) throw err;　
-        if(!success) {
+        if(err){
+          res.status(404).send({success:false, msg: err})
+        }　else if(!success) {
             return res.status(404).send({success: false, msg: 'Video not found'});
         } else {
             res.json({
